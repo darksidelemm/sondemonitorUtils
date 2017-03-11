@@ -24,7 +24,7 @@ This script uses the COM/OLE interface to SondeMonitor to get more frequent posi
 ### Habitat Uploads
 The uploads to Habitat use the telemetry string format:
 `$$<callsign>,<sequence number>,<time>,<lat>,<lon>,<alt>,<speed>,<temp>,<humidity>*<CRC16>`
-Where the <callsign> field is set using the --habitat command line option. You should try and make this callsign fairly unique, to avoid clashing with other users of the Habitat tracker. For sondes launched in Adelaide, I use the callsign 'YPADSONDE'.
+Where the 'callsign' field is set using the --habitat command line option. You should try and make this callsign fairly unique, to avoid clashing with other users of the Habitat tracker. For sondes launched in Adelaide, I use the callsign 'YPADSONDE'.
 
 You will need to create a suitable 'Payload Document' for the payload to show up on the tracker. You can create such a payload document at http://habitat.habhub.org/genpayload/ . The existing 'YPADSONDE' payload document (Use 'Start from Existing' to find it) is a good starting point, you will just need to change the callsign.
 
