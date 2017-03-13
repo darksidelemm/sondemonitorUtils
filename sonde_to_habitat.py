@@ -126,7 +126,7 @@ def printData(sonde_data):
 	print("      Temp: %.1f Celsius" % sonde_data["temp"])
 
 def push_to_ozi(sonde_data):
-	sentence = "TELEM\ETRY,%s,%.5f,%.5f,%d" % (sonde_data['short_time'],sonde_data['lat'],sonde_data['lon'],sonde_data['alt'])
+	sentence = "TELEMETRY,%s,%.5f,%.5f,%d" % (sonde_data['short_time'],sonde_data['lat'],sonde_data['lon'],sonde_data['alt'])
 
 	try:
 		sock = socket(AF_INET,SOCK_DGRAM)
