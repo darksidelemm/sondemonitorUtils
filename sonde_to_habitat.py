@@ -126,7 +126,7 @@ def printData(sonde_data):
 	print("      Temp: %.1f Celsius" % sonde_data["temp"])
 
 def push_to_ozi(sonde_data):
-	sentence = "TELEMETRY,%s,%.5f,%.5f,%d" % (sonde_data['short_time'],sonde_data['lat'],sonde_data['lon'],sonde_data['alt'])
+	sentence = "TELEM\ETRY,%s,%.5f,%.5f,%d" % (sonde_data['short_time'],sonde_data['lat'],sonde_data['lon'],sonde_data['alt'])
 
 	try:
 		sock = socket(AF_INET,SOCK_DGRAM)
@@ -150,19 +150,20 @@ def push_payload_summary(sonde_data):
     }
 
     # Set up our UDP socket
-    s = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+    s = socket(AF_INET,SOCK_DGRAM)
     s.settimeout(1)
     # Set up socket for broadcast, and allow re-use of the address
-    s.setsockopt(socket.SOL_SOCKET,socket.SO_BROADCAST,1)
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    s.setsockopt(SOL_SOCKET,SO_BROADCAST,1)
+    s.setsockopt(SOL_SOCKET,SO_REUSEADDR, 1)
     try:
-        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        s.setsockopt(SOL_SOCKET,SO_REUSEPORT, 1)
     except:
         pass
     s.bind(('',HORUS_UDP_PORT))
     try:
         s.sendto(json.dumps(packet), ('<broadcast>', HORUS_UDP_PORT))
-    except socket.error:
+    except:
+    	print("Could not send UDP packet to broadcast, sending to localhost instead.")
         s.sendto(json.dumps(packet), ('127.0.0.1', HORUS_UDP_PORT))
 		
 if __name__ == "__main__":
@@ -185,7 +186,7 @@ if __name__ == "__main__":
 
 				if args.summary == True:
 					try:
-						push_payload_summary(sonde_data)
+						push_payload_summary(sonde_data_new)
 						print("Pushed payload summary successfuly!")
 					except:
 						print("Faliure when pushing payload summary.")
