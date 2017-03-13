@@ -24,7 +24,8 @@ ozi_udp_port = 8942
 parser = argparse.ArgumentParser()
 parser.add_argument("--habitat", type=str, help="Upload Sonde telemetry to Habitat using the given callsign.", default="None")
 parser.add_argument("--habitat_user_call", type=str, help="Source Callsign for Habitat Uploads.", default="SONDEMONITOR")
-parser.add_argument("--oziplotter", action="store_true", help="Push Sonde telemetry into OziPlotter via UDP.", default=True)
+parser.add_argument("--oziplotter", action="store_true", help="Push Sonde telemetry into OziPlotter via UDP.", default=False)
+parser.add_argument("--summary", action="store_true", help="Push Summary of Sonde telemetry into network via UDP broadcast (compatible with HorusGroundStation utilities).", default=False)
 parser.add_argument("-r", "--rate", type=int, help="Time between uploads (seconds).", default=10)
 args = parser.parse_args()
 
@@ -134,6 +135,35 @@ def push_to_ozi(sonde_data):
 	except Exception as uhoh:
 		print(uhoh)
 
+HORUS_UDP_PORT = 55672
+# Push a 'Payload Summary' message into the local network via UDP broacast.
+# This is used by the HorusGroundStation SummaryGUI utility, as well as other chase car widgets.
+def push_payload_summary(sonde_data):
+    packet = {
+        'type' : 'PAYLOAD_SUMMARY',
+        'callsign' : sonde_data['id'],
+        'latitude' : sonde_data['lat'],
+        'longitude' : sonde_data['lon'],
+        'altitude' : sonde_data['alt'],
+        'speed' : sonde_data['speed']*3.6,
+        'heading': sonde_data['course']
+    }
+
+    # Set up our UDP socket
+    s = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+    s.settimeout(1)
+    # Set up socket for broadcast, and allow re-use of the address
+    s.setsockopt(socket.SOL_SOCKET,socket.SO_BROADCAST,1)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    try:
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+    except:
+        pass
+    s.bind(('',HORUS_UDP_PORT))
+    try:
+        s.sendto(json.dumps(packet), ('<broadcast>', HORUS_UDP_PORT))
+    except socket.error:
+        s.sendto(json.dumps(packet), ('127.0.0.1', HORUS_UDP_PORT))
 		
 if __name__ == "__main__":
 	sonde_data_old = {'time_str':'blank'}
@@ -152,6 +182,13 @@ if __name__ == "__main__":
 						print("Data pushed to OziPlotter Successfully!")
 					except:
 						print("Failure when pushing data to OziPlotter")
+
+				if args.summary == True:
+					try:
+						push_payload_summary(sonde_data)
+						print("Pushed payload summary successfuly!")
+					except:
+						print("Faliure when pushing payload summary.")
 
 				if args.habitat != "None":
 					(success, message) = habitat_upload_payload_telemetry(telemetry=sonde_data_new, 
