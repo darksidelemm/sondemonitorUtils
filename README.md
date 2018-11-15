@@ -1,6 +1,8 @@
 Sondemonitor to APRS/Habitat/OziPlotter Bridge
 ================
 
+## NOTE - With the release of [radiosonde_auto_rx](https://github.com/projecthorus/radiosonde_auto_rx) and [chasemapper](https://github.com/projecthorus/chasemapper), I will no longerbe supporting this software. If your local sonde launches are using either Vaisala RS92/RS41 or Graw DFM06/09 radiosondes, I strongly suggest using radiosonde_auto_rx.
+
 I track Bureau of Meteorology Radiosondes occasionally, and I figured it'd be nice to be able to push their position into APRS, for mapping on aprs.fi.
 Even more recently, I decided that it would be more useful to have the sonde data show up on the Habitat tracker (http://tracker.habitat.org)
 
